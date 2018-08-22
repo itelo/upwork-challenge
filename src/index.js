@@ -1,8 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import App from "./App";
+import DrinkProvider from "./drinkAPI/DrinkProvider";
+import registerServiceWorker from "./registerServiceWorker";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <DrinkProvider>
+    <React.Fragment>
+      <CssBaseline />
+      <App />
+    </React.Fragment>
+  </DrinkProvider>,
+  document.getElementById("root")
+);
 registerServiceWorker();

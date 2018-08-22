@@ -1,48 +1,29 @@
 import React from "react";
 import { List, AutoSizer } from "react-virtualized";
+import PropTypes from "prop-types";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
 import withStyles from "@material-ui/core/styles/withStyles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import { List as ImmutableList } from "immutable";
 
 const marginHorizontal = 16;
 const marginVertical = 12;
+const rowHeight = 132;
 
-const styles = theme => ({
+const styles = {
   listContainer: {
     padding: `${marginVertical}px ${marginHorizontal}px`
   },
   cardContainer: {
     padding: marginHorizontal
-  },
-  backgroundColor: {
-    backgroundColor: "#33c9dc"
   }
-});
+};
 
-class ListAwesome extends React.Component {
-  state ={ elevation: 0} 
-  handleElevationChange = (elevation) => {
-    const currentElevation = this.state.elevation
-    if (currentElevation !== elevation) {
-      this.setState({elevation})
-    }
-  }
-  handleScroll = event => {
-    if (event.scrollTop >= marginVertical) {
-      this.handleElevationChange(2)
-    } else {
-      this.handleElevationChange(0)
-    }
-  }
+class DrinksList extends React.Component {
   rowRenderer = ({
     key, // Unique key within array of rows
     index, // Index of row within collection
-    isScrolling, // The List is currently being scrolled
-    isVisible, // This row is visible within the List (eg it is not an overscanned row)
     style // Style object to be applied to row (to position it)
   }) => {
     const { classes, list } = this.props;
@@ -53,7 +34,7 @@ class ListAwesome extends React.Component {
         key={key}
         style={{ ...style, width: `calc(100vw - ${2 * marginHorizontal}px)` }}
         className={classes.rowContainer}
-        onClick={() => alert(row.idDrink)}
+        onClick={this.props.handleClick(row.idDrink, index)}
       >
         <Paper elevation={1} style={{ height: style.height - marginVertical }}>
           <Grid
@@ -64,6 +45,7 @@ class ListAwesome extends React.Component {
           >
             <Grid item>
               <img
+                alt={`thumb of ${row.strDrink}`}
                 src={row.strDrinkThumb}
                 style={{
                   height:
@@ -92,34 +74,33 @@ class ListAwesome extends React.Component {
     );
   };
   render() {
-    const {elevation}= this.state ;
-    const { classes, list } = this.props;
+    const { classes, list, scrollToIndex } = this.props;
     return (
-      <div style={{ background: "#33c9dc", height: "100vh", width: "100vw" }}>
-        <AppBar elevation={elevation} classes={{ root: classes.backgroundColor }}>
-          <Toolbar>
-            <Typography variant="title" color="inherit">
-              News
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <AutoSizer>
-          {({ width, height }) => (
-            <List
-              onScroll={this.handleScroll}
-              className={classes.listContainer}
-              width={width}
-              height={height}
-              rowCount={list.size}
-              rowHeight={132}
-              rowRenderer={this.rowRenderer}
-              style={{ marginTop: 56 }}
-            /> 
-          )}
-        </AutoSizer>
-      </div>
+      <AutoSizer>
+        {({ width, height }) => (
+          <List
+            className={classes.listContainer}
+            width={width}
+            height={height}
+            rowCount={list.size}
+            rowHeight={rowHeight}
+            scrollToAlignment="start"
+            scrollToIndex={scrollToIndex}
+            rowRenderer={this.rowRenderer}
+          />
+        )}
+      </AutoSizer>
     );
   }
 }
 
-export default withStyles(styles)(ListAwesome);
+DrinksList.propTypes = {
+  list: PropTypes.instanceOf(ImmutableList).isRequired,
+  classes: PropTypes.shape({
+    listContainer: PropTypes.string.isRequired,
+    cardContainer: PropTypes.string.isRequired
+  }).isRequired,
+  scrollToIndex: PropTypes.number
+};
+
+export default withStyles(styles)(DrinksList);
